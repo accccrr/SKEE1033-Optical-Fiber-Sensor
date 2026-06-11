@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-波长偏移计算模块
-负责计算每个位移位置相对于零位移的波长变化
+Wavelength Shift Calculation Module
+Responsible for calculating wavelength change relative to zero displacement for each position
 """
 
 import numpy as np
@@ -11,45 +11,45 @@ from config import get_displacement_array
 
 def calculate_wavelength_shift(dip_wavelength):
     """
-    计算波长偏移（Δλ）
+    Calculate wavelength shift (Δλ)
 
     Args:
-        dip_wavelength: Dip wavelength数组，单位nm
+        dip_wavelength: Dip wavelength array in nm
 
     Returns:
-        numpy.ndarray: 波长偏移数组，单位nm
+        numpy.ndarray: Wavelength shift array in nm
 
-    计算公式:
+    Calculation formula:
         Δλ[n] = λ[n] - λ[0]
 
-    参数说明:
-        Δλ[n]: 第n个位移位置的波长偏移
-        λ[n]: 第n个位移位置的dip wavelength
-        λ[0]: 零位移时的dip wavelength（参考基准）
+    Parameter explanation:
+        Δλ[n]: Wavelength shift at displacement position n
+        λ[n]: Dip wavelength at displacement position n
+        λ[0]: Dip wavelength at zero displacement (reference)
 
-    物理意义:
-        波长偏移反映了传感器对位移的响应灵敏度。
-        正偏移表示波长随位移增加而增大，
-        负偏移表示波长随位移增加而减小。
+    Physical meaning:
+        Wavelength shift reflects the sensor's response sensitivity to displacement.
+        Positive shift means wavelength increases with displacement,
+        Negative shift means wavelength decreases with displacement.
     """
-    # 零位移时的dip wavelength作为参考基准
+    # Dip wavelength at zero displacement as reference
     reference_wavelength = dip_wavelength[0]
 
-    # 计算波长偏移
+    # Calculate wavelength shift
     wavelength_shift = dip_wavelength - reference_wavelength
 
     print("="*60)
-    print("波长偏移计算结果:")
+    print("Wavelength Shift Calculation Results:")
     print("="*60)
 
     displacement = get_displacement_array()
 
     for i, (disp, shift) in enumerate(zip(displacement, wavelength_shift)):
-        print(f"位移 {disp} mm: 波长偏移 Δλ = {shift:.4f} nm")
+        print(f"Displacement {disp} mm: Wavelength shift Δλ = {shift:.4f} nm")
 
     print("="*60)
-    print(f"参考波长（零位移）: {reference_wavelength:.4f} nm")
-    print(f"波长偏移范围: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm")
+    print(f"Reference wavelength (zero displacement): {reference_wavelength:.4f} nm")
+    print(f"Wavelength shift range: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm")
     print("="*60)
 
     return wavelength_shift
@@ -57,42 +57,42 @@ def calculate_wavelength_shift(dip_wavelength):
 
 def validate_wavelength_shift(wavelength_shift):
     """
-    验证波长偏移计算的正确性
+    Validate correctness of wavelength shift calculation
 
     Args:
-        wavelength_shift: 波长偏移数组
+        wavelength_shift: Wavelength shift array
 
     Returns:
-        bool: 计算是否正确
+        bool: Whether calculation is correct
 
-    检查项:
-        1. 零位移时的波长偏移必须为0
-        2. 波长偏移值应在合理范围内（通常几纳米）
+    Check items:
+        1. Wavelength shift at zero displacement must be 0
+        2. Wavelength shift values should be within reasonable range (typically a few nanometers)
     """
-    # 检查零位移时的偏移是否为0
+    # Check if shift at zero displacement is 0
     if wavelength_shift[0] != 0:
         raise ValueError(
-            f"零位移时的波长偏移不为0: {wavelength_shift[0]}"
+            f"Wavelength shift at zero displacement is not 0: {wavelength_shift[0]}"
         )
 
-    # 检查波长偏移范围是否合理（通常在几纳米范围内）
+    # Check if wavelength shift range is reasonable (typically within a few nanometers)
     max_shift = np.abs(wavelength_shift).max()
-    if max_shift > 10:  # 如果超过10nm，可能存在问题
-        print(f"警告: 波长偏移值较大 ({max_shift:.2f} nm)，请检查数据")
+    if max_shift > 10:  # If exceeds 10nm, there may be an issue
+        print(f"Warning: Large wavelength shift value ({max_shift:.2f} nm), please check data")
 
-    print("\n波长偏移验证通过!")
+    print("\nWavelength shift validation passed!")
     return True
 
 
 def calculate_shift_statistics(wavelength_shift):
     """
-    计算波长偏移的统计特性
+    Calculate statistical characteristics of wavelength shift
 
     Args:
-        wavelength_shift: 波长偏移数组
+        wavelength_shift: Wavelength shift array
 
     Returns:
-        dict: 统计信息字典
+        dict: Statistics dictionary
     """
     displacement = get_displacement_array()
 
@@ -104,27 +104,27 @@ def calculate_shift_statistics(wavelength_shift):
         'shift_range': wavelength_shift.max() - wavelength_shift.min(),
     }
 
-    print("\n波长偏移统计信息:")
-    print(f"  平均偏移: {statistics['mean_shift']:.4f} nm")
-    print(f"  标准差: {statistics['std_shift']:.4f} nm")
-    print(f"  最大偏移: {statistics['max_shift']:.4f} nm")
-    print(f"  最小偏移: {statistics['min_shift']:.4f} nm")
-    print(f"  偏移范围: {statistics['shift_range']:.4f} nm")
+    print("\nWavelength Shift Statistics:")
+    print(f"  Mean shift: {statistics['mean_shift']:.4f} nm")
+    print(f"  Standard deviation: {statistics['std_shift']:.4f} nm")
+    print(f"  Maximum shift: {statistics['max_shift']:.4f} nm")
+    print(f"  Minimum shift: {statistics['min_shift']:.4f} nm")
+    print(f"  Shift range: {statistics['shift_range']:.4f} nm")
 
     return statistics
 
 
 def create_shift_data_dict(displacement, dip_wavelength, wavelength_shift):
     """
-    创建包含位移、dip波长和波长偏移的数据字典
+    Create data dictionary containing displacement, dip wavelength, and wavelength shift
 
     Args:
-        displacement: 位移数组
-        dip_wavelength: Dip wavelength数组
-        wavelength_shift: 波长偏移数组
+        displacement: Displacement array
+        dip_wavelength: Dip wavelength array
+        wavelength_shift: Wavelength shift array
 
     Returns:
-        dict: 数据字典
+        dict: Data dictionary
     """
     data_dict = {
         'displacement': displacement,
@@ -136,7 +136,7 @@ def create_shift_data_dict(displacement, dip_wavelength, wavelength_shift):
 
 
 if __name__ == "__main__":
-    # 测试波长偏移计算
+    # Test wavelength shift calculation
     from data_loader import load_all_data
     from dip_analysis import find_dip_wavelength
 
@@ -145,17 +145,17 @@ if __name__ == "__main__":
 
     wavelength_shift = calculate_wavelength_shift(dip_wavelength)
 
-    # 验证计算结果
+    # Validate calculation results
     validate_wavelength_shift(wavelength_shift)
 
-    # 计算统计信息
+    # Calculate statistics
     statistics = calculate_shift_statistics(wavelength_shift)
 
-    # 创建数据字典
+    # Create data dictionary
     displacement = get_displacement_array()
     data_dict = create_shift_data_dict(displacement, dip_wavelength, wavelength_shift)
 
-    print(f"\n数据字典示例:")
-    print(f"  位移: {data_dict['displacement'][:5]}")
-    print(f"  Dip波长: {data_dict['dip_wavelength'][:5]}")
-    print(f"  波长偏移: {data_dict['wavelength_shift'][:5]}")
+    print(f"\nData dictionary example:")
+    print(f"  Displacement: {data_dict['displacement'][:5]}")
+    print(f"  Dip wavelength: {data_dict['dip_wavelength'][:5]}")
+    print(f"  Wavelength shift: {data_dict['wavelength_shift'][:5]}")

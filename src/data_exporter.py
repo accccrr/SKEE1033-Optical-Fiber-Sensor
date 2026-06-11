@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-数据导出模块
-负责将分析结果保存为CSV文件
+Data Export Module
+Responsible for saving analysis results to CSV files
 """
 
 import os
@@ -12,53 +12,53 @@ from config import OUTPUT_DIR, OUTPUT_CSV, DECIMAL_PLACES, ensure_output_dir
 
 def save_to_csv(displacement, dip_wavelength, wavelength_shift):
     """
-    将位移、dip波长和波长偏移数据保存为CSV文件
+    Save displacement, dip wavelength, and wavelength shift data to CSV file
 
     Args:
-        displacement: 位移数组，单位mm
-        dip_wavelength: Dip wavelength数组，单位nm
-        wavelength_shift: 波长偏移数组，单位nm
+        displacement: Displacement array in mm
+        dip_wavelength: Dip wavelength array in nm
+        wavelength_shift: Wavelength shift array in nm
 
     Returns:
-        str: CSV文件路径
+        str: CSV file path
 
-    CSV文件格式:
+    CSV file format:
         displacement,dip_wavelength,wavelength_shift
         0,1550.234,0.000
         2,1550.876,0.642
         ...
     """
-    # 确保输出目录存在
+    # Ensure output directory exists
     ensure_output_dir()
 
-    # CSV文件路径
+    # CSV file path
     filepath = os.path.join(OUTPUT_DIR, OUTPUT_CSV)
 
-    # 创建数据矩阵
+    # Create data matrix
     data = np.column_stack([displacement, dip_wavelength, wavelength_shift])
 
-    # 保存为CSV文件
+    # Save to CSV file
     header = 'displacement,dip_wavelength,wavelength_shift'
 
-    # 使用numpy.savetxt保存
+    # Use numpy.savetxt to save
     np.savetxt(
         filepath,
         data,
         delimiter=',',
         header=header,
-        comments='',  # 不添加注释符号
-        fmt=f'%.{DECIMAL_PLACES}f'  # 格式化小数位数
+        comments='',  # Do not add comment symbol
+        fmt=f'%.{DECIMAL_PLACES}f'  # Format decimal places
     )
 
     print("="*60)
-    print("CSV文件保存成功!")
+    print("CSV file saved successfully!")
     print("="*60)
-    print(f"文件路径: {filepath}")
-    print(f"数据行数: {len(displacement)}")
-    print(f"数据列数: 3")
+    print(f"File path: {filepath}")
+    print(f"Number of data rows: {len(displacement)}")
+    print(f"Number of data columns: 3")
 
-    # 显示CSV文件内容示例
-    print("\nCSV文件内容示例:")
+    # Show CSV file content example
+    print("\nCSV file content example:")
     print(header)
     for i in range(min(5, len(displacement))):
         print(f"{displacement[i]:.{DECIMAL_PLACES}f},"
@@ -72,17 +72,17 @@ def save_to_csv(displacement, dip_wavelength, wavelength_shift):
 def save_analysis_summary(displacement, dip_wavelength, wavelength_shift,
                           sensitivity, r_squared):
     """
-    保存分析摘要到文本文件
+    Save analysis summary to text file
 
     Args:
-        displacement: 位移数组
-        dip_wavelength: Dip wavelength数组
-        wavelength_shift: 波长偏移数组
-        sensitivity: 传感器灵敏度（nm/mm）
-        r_squared: 线性拟合的R²值
+        displacement: Displacement array
+        dip_wavelength: Dip wavelength array
+        wavelength_shift: Wavelength shift array
+        sensitivity: Sensor sensitivity (nm/mm)
+        r_squared: R² value of linear fit
 
     Returns:
-        str: 摘要文件路径
+        str: Summary file path
     """
     ensure_output_dir()
 
@@ -90,71 +90,71 @@ def save_analysis_summary(displacement, dip_wavelength, wavelength_shift,
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("="*60 + "\n")
-        f.write("光纤位移传感器性能分析摘要\n")
+        f.write("Optical Fiber Displacement Sensor Performance Analysis Summary\n")
         f.write("="*60 + "\n\n")
 
-        f.write("一、数据概况\n")
-        f.write(f"  测量点数: {len(displacement)}\n")
-        f.write(f"  位移范围: {displacement.min()} - {displacement.max()} mm\n")
-        f.write(f"  Dip波长范围: {dip_wavelength.min():.4f} - {dip_wavelength.max():.4f} nm\n")
-        f.write(f"  波长偏移范围: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm\n\n")
+        f.write("1. Data Overview\n")
+        f.write(f"  Number of measurement points: {len(displacement)}\n")
+        f.write(f"  Displacement range: {displacement.min()} - {displacement.max()} mm\n")
+        f.write(f"  Dip wavelength range: {dip_wavelength.min():.4f} - {dip_wavelength.max():.4f} nm\n")
+        f.write(f"  Wavelength shift range: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm\n\n")
 
-        f.write("二、传感器性能\n")
-        f.write(f"  灵敏度: {sensitivity:.4f} nm/mm\n")
-        f.write(f"  线性拟合R²值: {r_squared:.4f}\n\n")
+        f.write("2. Sensor Performance\n")
+        f.write(f"  Sensitivity: {sensitivity:.4f} nm/mm\n")
+        f.write(f"  Linear fit R² value: {r_squared:.4f}\n\n")
 
-        f.write("三、详细数据\n")
-        f.write("位移(mm) | Dip波长(nm) | 波长偏移(nm)\n")
+        f.write("3. Detailed Data\n")
+        f.write("Displacement(mm) | Dip Wavelength(nm) | Wavelength Shift(nm)\n")
         f.write("-"*50 + "\n")
         for d, wl, ws in zip(displacement, dip_wavelength, wavelength_shift):
-            f.write(f"{d:6.2f} | {wl:12.4f} | {ws:12.4f}\n")
+            f.write(f"{d:6.2f} | {wl:14.4f} | {ws:16.4f}\n")
 
-    print(f"\n分析摘要已保存: {filepath}")
+    print(f"\nAnalysis summary saved: {filepath}")
 
     return filepath
 
 
 def verify_csv_file(filepath):
     """
-    验证CSV文件的正确性
+    Verify correctness of CSV file
 
     Args:
-        filepath: CSV文件路径
+        filepath: CSV file path
 
     Returns:
-        bool: 文件是否有效
+        bool: Whether file is valid
     """
     if not os.path.exists(filepath):
-        raise FileNotFoundError(f"CSV文件不存在: {filepath}")
+        raise FileNotFoundError(f"CSV file not found: {filepath}")
 
-    # 读取CSV文件
+    # Read CSV file
     data = np.loadtxt(filepath, delimiter=',', skiprows=1)
 
-    # 检查数据维度
+    # Check data dimensions
     if data.shape[1] != 3:
-        raise ValueError(f"CSV文件列数不正确: {data.shape[1]} != 3")
+        raise ValueError(f"CSV file has incorrect number of columns: {data.shape[1]} != 3")
 
-    print(f"\nCSV文件验证通过!")
-    print(f"  数据维度: {data.shape}")
+    print(f"\nCSV file verification passed!")
+    print(f"  Data dimensions: {data.shape}")
 
     return True
 
 
 if __name__ == "__main__":
-    # 测试CSV保存功能
+    # Test CSV saving functionality
     from data_loader import load_all_data
     from dip_analysis import find_dip_wavelength
     from wavelength_shift import calculate_wavelength_shift
     from config import get_displacement_array
 
-    # 加载和处理数据
+    # Load and process data
     wavelength, power_data = load_all_data()
     dip_wavelength = find_dip_wavelength(wavelength, power_data)
     wavelength_shift = calculate_wavelength_shift(dip_wavelength)
     displacement = get_displacement_array()
 
-    # 保存CSV文件
+    # Save CSV file
     csv_path = save_to_csv(displacement, dip_wavelength, wavelength_shift)
 
-    # 验证CSV文件
+    # Verify CSV file
     verify_csv_file(csv_path)

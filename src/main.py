@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-主程序模块
-整合所有功能模块，完成光纤位移传感器性能分析
+Main Program Module
+Integrates all functional modules to complete optical fiber displacement sensor performance analysis
 """
 
 import os
 import sys
 from datetime import datetime
 
-# 导入各个功能模块
+# Import functional modules
 from config import (
     ensure_output_dir, OUTPUT_DIR, get_displacement_array,
     NUM_MEASUREMENTS
@@ -32,185 +32,185 @@ from plotting import (
 
 
 def print_header():
-    """打印程序标题"""
+    """Print program header"""
     print("\n" + "="*70)
-    print(" "*15 + "光纤位移传感器性能分析程序")
+    print(" "*15 + "Optical Fiber Displacement Sensor Performance Analysis")
     print(" "*20 + "Scientific Programming Project")
     print("="*70)
-    print(f"运行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"输出目录: {OUTPUT_DIR}")
+    print(f"Run time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Output directory: {OUTPUT_DIR}")
     print("="*70 + "\n")
 
 
 def print_summary(displacement, dip_wavelength, wavelength_shift,
                   sensitivity, r_squared, performance):
     """
-    打印分析结果摘要
+    Print analysis results summary
 
     Args:
-        displacement: 位移数组
-        dip_wavelength: Dip wavelength数组
-        wavelength_shift: 波长偏移数组
-        sensitivity: 传感器灵敏度
-        r_squared: R²值
-        performance: 性能评估结果
+        displacement: Displacement array
+        dip_wavelength: Dip wavelength array
+        wavelength_shift: Wavelength shift array
+        sensitivity: Sensor sensitivity
+        r_squared: R² value
+        performance: Performance evaluation results
     """
     print("\n" + "="*70)
-    print(" "*25 + "分析结果摘要")
+    print(" "*25 + "Analysis Results Summary")
     print("="*70)
 
-    print("\n一、基本数据统计")
-    print(f"  测量点数: {len(displacement)}")
-    print(f"  位移范围: {displacement.min()} - {displacement.max()} mm")
-    print(f"  Dip波长范围: {dip_wavelength.min():.4f} - {dip_wavelength.max():.4f} nm")
-    print(f"  波长偏移范围: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm")
+    print("\n1. Basic Data Statistics")
+    print(f"  Number of measurement points: {len(displacement)}")
+    print(f"  Displacement range: {displacement.min()} - {displacement.max()} mm")
+    print(f"  Dip wavelength range: {dip_wavelength.min():.4f} - {dip_wavelength.max():.4f} nm")
+    print(f"  Wavelength shift range: {wavelength_shift.min():.4f} - {wavelength_shift.max():.4f} nm")
 
-    print("\n二、传感器性能指标")
-    print(f"  灵敏度: {sensitivity:.4f} nm/mm")
-    print(f"  线性拟合R²值: {r_squared:.4f}")
-    print(f"  灵敏度评估: {performance['sensitivity_level']}")
-    print(f"  线性度评估: {performance['linearity_level']}")
-    print(f"  综合评估: {performance['overall_score']}")
+    print("\n2. Sensor Performance Metrics")
+    print(f"  Sensitivity: {sensitivity:.4f} nm/mm")
+    print(f"  Linear fit R² value: {r_squared:.4f}")
+    print(f"  Sensitivity evaluation: {performance['sensitivity_level']}")
+    print(f"  Linearity evaluation: {performance['linearity_level']}")
+    print(f"  Overall evaluation: {performance['overall_score']}")
 
-    print("\n三、详细数据表")
-    print("位移(mm) | Dip波长(nm) | 波长偏移(nm)")
+    print("\n3. Detailed Data Table")
+    print("Displacement(mm) | Dip Wavelength(nm) | Wavelength Shift(nm)")
     print("-"*50)
     for d, wl, ws in zip(displacement, dip_wavelength, wavelength_shift):
-        print(f"{d:6.2f}   | {wl:12.4f}  | {ws:12.4f}")
+        print(f"{d:6.2f}   | {wl:14.4f}  | {ws:16.4f}")
 
     print("="*70)
 
 
 def main():
     """
-    主函数：执行完整的分析流程
+    Main function: Execute complete analysis workflow
 
-    分析流程:
-        1. 加载原始数据
-        2. 计算Dip wavelength
-        3. 计算波长偏移
-        4. 执行线性拟合
-        5. 计算传感器灵敏度
-        6. 保存数据到CSV
-        7. 生成分析图表
-        8. 保存分析摘要
+    Analysis workflow:
+        1. Load raw data
+        2. Calculate dip wavelength
+        3. Calculate wavelength shift
+        4. Perform linear fitting
+        5. Calculate sensor sensitivity
+        6. Save data to CSV
+        7. Generate analysis plots
+        8. Save analysis summary
     """
     try:
-        # 打印程序标题
+        # Print program header
         print_header()
 
-        # 确保输出目录存在
+        # Ensure output directory exists
         ensure_output_dir()
 
-        # 步骤1: 加载原始数据
-        print("\n【步骤1】加载原始数据")
+        # Step 1: Load raw data
+        print("\n【Step 1】Loading Raw Data")
         wavelength, power_data = load_all_data()
 
-        # 步骤2: 计算Dip wavelength
-        print("\n【步骤2】计算Dip Wavelength")
+        # Step 2: Calculate dip wavelength
+        print("\n【Step 2】Calculating Dip Wavelength")
         dip_wavelength = find_dip_wavelength(wavelength, power_data)
 
-        # 分析Dip特征
+        # Analyze dip characteristics
         dip_characteristics = analyze_dip_characteristics(
             wavelength, power_data, dip_wavelength
         )
 
-        # 步骤3: 计算波长偏移
-        print("\n【步骤3】计算波长偏移")
+        # Step 3: Calculate wavelength shift
+        print("\n【Step 3】Calculating Wavelength Shift")
         wavelength_shift = calculate_wavelength_shift(dip_wavelength)
 
-        # 验证波长偏移计算
+        # Validate wavelength shift calculation
         validate_wavelength_shift(wavelength_shift)
 
-        # 计算波长偏移统计信息
+        # Calculate wavelength shift statistics
         shift_statistics = calculate_shift_statistics(wavelength_shift)
 
-        # 获取位移数组
+        # Get displacement array
         displacement = get_displacement_array()
 
-        # 步骤4: 执行线性拟合
-        print("\n【步骤4】执行线性拟合")
+        # Step 4: Perform linear fitting
+        print("\n【Step 4】Performing Linear Fitting")
         fit_results = perform_linear_fit(displacement, wavelength_shift)
 
-        # 分析残差
+        # Analyze residuals
         residual_analysis = analyze_residuals(
             fit_results['residuals'], displacement
         )
 
-        # 步骤5: 计算传感器灵敏度
-        print("\n【步骤5】计算传感器灵敏度")
+        # Step 5: Calculate sensor sensitivity
+        print("\n【Step 5】Calculating Sensor Sensitivity")
         sensitivity = calculate_sensitivity(fit_results['slope'])
 
-        # 评估传感器性能
+        # Evaluate sensor performance
         performance = evaluate_sensor_performance(
             sensitivity, fit_results['r_squared']
         )
 
-        # 步骤6: 保存数据到CSV
-        print("\n【步骤6】保存数据到CSV")
+        # Step 6: Save data to CSV
+        print("\n【Step 6】Saving Data to CSV")
         csv_path = save_to_csv(displacement, dip_wavelength, wavelength_shift)
 
-        # 验证CSV文件
+        # Verify CSV file
         verify_csv_file(csv_path)
 
-        # 步骤7: 生成分析图表
-        print("\n【步骤7】生成分析图表")
+        # Step 7: Generate analysis plots
+        print("\n【Step 7】Generating Analysis Plots")
 
-        # 绘制光谱图
+        # Plot spectra
         spectra_path = plot_spectra(wavelength, power_data, displacement)
 
-        # 绘制波长偏移图
+        # Plot wavelength shift
         shift_path = plot_wavelength_shift(displacement, wavelength_shift)
 
-        # 绘制线性拟合图
+        # Plot linear fit
         fit_path = plot_linear_fit(
             displacement, wavelength_shift,
             fit_results['slope'], fit_results['intercept'],
             fit_results['r_squared']
         )
 
-        # 绘制全光谱对比图（可选）
+        # Plot all spectra comparison (optional)
         all_spectra_path = plot_all_spectra_comparison(
             wavelength, power_data, displacement
         )
 
-        # 步骤8: 保存分析摘要
-        print("\n【步骤8】保存分析摘要")
+        # Step 8: Save analysis summary
+        print("\n【Step 8】Saving Analysis Summary")
         summary_path = save_analysis_summary(
             displacement, dip_wavelength, wavelength_shift,
             sensitivity, fit_results['r_squared']
         )
 
-        # 打印分析结果摘要
+        # Print analysis results summary
         print_summary(
             displacement, dip_wavelength, wavelength_shift,
             sensitivity, fit_results['r_squared'], performance
         )
 
-        # 打印完成信息
+        # Print completion message
         print("\n" + "="*70)
-        print(" "*25 + "分析完成!")
+        print(" "*25 + "Analysis Complete!")
         print("="*70)
-        print(f"\n输出文件:")
-        print(f"  CSV数据: {csv_path}")
-        print(f"  光谱图: {spectra_path}")
-        print(f"  波长偏移图: {shift_path}")
-        print(f"  线性拟合图: {fit_path}")
-        print(f"  全光谱对比图: {all_spectra_path}")
-        print(f"  分析摘要: {summary_path}")
+        print(f"\nOutput files:")
+        print(f"  CSV data: {csv_path}")
+        print(f"  Spectra plot: {spectra_path}")
+        print(f"  Wavelength shift plot: {shift_path}")
+        print(f"  Linear fit plot: {fit_path}")
+        print(f"  All spectra comparison: {all_spectra_path}")
+        print(f"  Analysis summary: {summary_path}")
         print("="*70 + "\n")
 
         return True
 
     except Exception as e:
         print("\n" + "="*70)
-        print("错误: 分析过程中出现异常")
+        print("Error: Exception occurred during analysis")
         print("="*70)
-        print(f"错误信息: {str(e)}")
-        print(f"错误类型: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
         print("="*70)
 
-        # 打印详细的错误追踪信息
+        # Print detailed error traceback
         import traceback
         traceback.print_exc()
 
@@ -218,10 +218,10 @@ def main():
 
 
 if __name__ == "__main__":
-    # 运行主程序
+    # Run main program
     success = main()
 
-    # 根据执行结果设置退出码
+    # Set exit code based on execution result
     if success:
         sys.exit(0)
     else:

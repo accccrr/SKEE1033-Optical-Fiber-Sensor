@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-绘图模块
-负责生成光谱图、波长偏移图和线性拟合图
+Plotting Module
+Responsible for generating spectra plot, wavelength shift plot, and linear fit plot
 """
 
 import os
@@ -15,37 +15,37 @@ from config import (
     SPECTRA_COLORS, get_plot_indices, ensure_output_dir
 )
 
-# 设置matplotlib支持中文（如果需要）
+# Set matplotlib font (if needed)
 matplotlib.rcParams['font.family'] = 'DejaVu Sans'
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 
 def plot_spectra(wavelength, power_data, displacement):
     """
-    绘制不同位移下的光谱图（功率vs波长）
+    Plot spectra (power vs wavelength) for different displacements
 
     Args:
-        wavelength: 波长数组，单位nm
-        power_data: 功率数据矩阵，shape=(波长点数, 位移点数)
-        displacement: 位移数组，单位mm
+        wavelength: Wavelength array in nm
+        power_data: Power data matrix with shape=(number of wavelength points, number of displacement points)
+        displacement: Displacement array in mm
 
     Returns:
-        str: 图像文件路径
+        str: Image file path
 
-    绘图要求:
-        - 选择的位移点: 0, 4, 8, 12, 16, 20, 24, 28 mm
-        - 共8条曲线，使用不同颜色区分
-        - 包含图例、坐标轴标签、标题
+    Plot requirements:
+        - Selected displacement points: 0, 4, 8, 12, 16, 20, 24, 28 mm
+        - 8 curves total, distinguished by different colors
+        - Include legend, axis labels, and title
     """
     ensure_output_dir()
 
-    # 获取需要绘制的位移索引
+    # Get indices of displacement points to plot
     plot_indices = get_plot_indices()
 
-    # 创建图形
+    # Create figure
     plt.figure(figsize=PLOT_SIZE)
 
-    # 绘制每条光谱曲线
+    # Plot each spectra curve
     for idx, color in zip(plot_indices, SPECTRA_COLORS):
         disp_value = displacement[idx]
         plt.plot(
@@ -56,56 +56,56 @@ def plot_spectra(wavelength, power_data, displacement):
             label=f'{disp_value} mm'
         )
 
-    # 设置坐标轴标签和标题
+    # Set axis labels and title
     plt.xlabel('Wavelength (nm)', fontsize=12)
     plt.ylabel('Power (dBm)', fontsize=12)
     plt.title('Optical Fiber Displacement Sensor Spectra', fontsize=14)
 
-    # 设置图例
+    # Set legend
     plt.legend(loc='best', fontsize=10)
 
-    # 添加网格
+    # Add grid
     plt.grid(True, alpha=0.3)
 
-    # 调整布局
+    # Adjust layout
     plt.tight_layout()
 
-    # 保存图像
+    # Save image
     filepath = os.path.join(OUTPUT_DIR, OUTPUT_SPECTRA_PLOT)
     plt.savefig(filepath, dpi=PLOT_DPI, format=PLOT_FORMAT)
     plt.close()
 
     print("="*60)
-    print("光谱图保存成功!")
+    print("Spectra plot saved successfully!")
     print("="*60)
-    print(f"文件路径: {filepath}")
-    print(f"包含位移点: {[displacement[i] for i in plot_indices]} mm")
+    print(f"File path: {filepath}")
+    print(f"Displacement points included: {[displacement[i] for i in plot_indices]} mm")
 
     return filepath
 
 
 def plot_wavelength_shift(displacement, wavelength_shift):
     """
-    绘制波长偏移vs位移的散点图
+    Plot scatter plot of wavelength shift vs displacement
 
     Args:
-        displacement: 位移数组，单位mm
-        wavelength_shift: 波长偏移数组，单位nm
+        displacement: Displacement array in mm
+        wavelength_shift: Wavelength shift array in nm
 
     Returns:
-        str: 图像文件路径
+        str: Image file path
 
-    绘图要求:
-        - 横轴: 位移（mm）
-        - 纵轴: 波长偏移Δλ（nm）
-        - 使用散点图或折线图
+    Plot requirements:
+        - X-axis: Displacement (mm)
+        - Y-axis: Wavelength shift Δλ (nm)
+        - Use scatter plot or line plot
     """
     ensure_output_dir()
 
-    # 创建图形
+    # Create figure
     plt.figure(figsize=PLOT_SIZE)
 
-    # 绘制散点图
+    # Plot scatter points
     plt.scatter(
         displacement,
         wavelength_shift,
@@ -116,7 +116,7 @@ def plot_wavelength_shift(displacement, wavelength_shift):
         zorder=3
     )
 
-    # 绘制折线连接数据点
+    # Plot line connecting data points
     plt.plot(
         displacement,
         wavelength_shift,
@@ -126,61 +126,61 @@ def plot_wavelength_shift(displacement, wavelength_shift):
         zorder=2
     )
 
-    # 设置坐标轴标签和标题
+    # Set axis labels and title
     plt.xlabel('Displacement (mm)', fontsize=12)
     plt.ylabel('Wavelength Shift Δλ (nm)', fontsize=12)
     plt.title('Wavelength Shift vs Displacement', fontsize=14)
 
-    # 设置图例
+    # Set legend
     plt.legend(loc='best', fontsize=10)
 
-    # 添加网格
+    # Add grid
     plt.grid(True, alpha=0.3)
 
-    # 调整布局
+    # Adjust layout
     plt.tight_layout()
 
-    # 保存图像
+    # Save image
     filepath = os.path.join(OUTPUT_DIR, OUTPUT_SHIFT_PLOT)
     plt.savefig(filepath, dpi=PLOT_DPI, format=PLOT_FORMAT)
     plt.close()
 
     print("="*60)
-    print("波长偏移图保存成功!")
+    print("Wavelength shift plot saved successfully!")
     print("="*60)
-    print(f"文件路径: {filepath}")
+    print(f"File path: {filepath}")
 
     return filepath
 
 
 def plot_linear_fit(displacement, wavelength_shift, slope, intercept, r_squared):
     """
-    绘制线性拟合结果图
+    Plot linear fit results
 
     Args:
-        displacement: 位移数组，单位mm
-        wavelength_shift: 波长偏移数组，单位nm
-        slope: 拟合直线斜率（灵敏度）
-        intercept: 拟合直线截距
-        r_squared: R²值
+        displacement: Displacement array in mm
+        wavelength_shift: Wavelength shift array in nm
+        slope: Slope of fitted line (sensitivity)
+        intercept: Intercept of fitted line
+        r_squared: R² value
 
     Returns:
-        str: 图像文件路径
+        str: Image file path
 
-    绘图要求:
-        - 同时显示原始数据点和拟合直线
-        - 标注拟合方程
-        - 显示R²值
+    Plot requirements:
+        - Show both original data points and fitted line
+        - Label fitting equation
+        - Display R² value
     """
     ensure_output_dir()
 
-    # 计算拟合直线
+    # Calculate fitted line
     y_pred = slope * displacement + intercept
 
-    # 创建图形
+    # Create figure
     plt.figure(figsize=PLOT_SIZE)
 
-    # 绘制原始数据点
+    # Plot original data points
     plt.scatter(
         displacement,
         wavelength_shift,
@@ -191,7 +191,7 @@ def plot_linear_fit(displacement, wavelength_shift, slope, intercept, r_squared)
         zorder=3
     )
 
-    # 绘制拟合直线
+    # Plot fitted line
     plt.plot(
         displacement,
         y_pred,
@@ -201,52 +201,52 @@ def plot_linear_fit(displacement, wavelength_shift, slope, intercept, r_squared)
         zorder=2
     )
 
-    # 设置坐标轴标签和标题
+    # Set axis labels and title
     plt.xlabel('Displacement (mm)', fontsize=12)
     plt.ylabel('Wavelength Shift Δλ (nm)', fontsize=12)
     plt.title('Wavelength Shift vs Displacement with Linear Fit', fontsize=14)
 
-    # 设置图例
+    # Set legend
     plt.legend(loc='best', fontsize=10)
 
-    # 添加网格
+    # Add grid
     plt.grid(True, alpha=0.3)
 
-    # 调整布局
+    # Adjust layout
     plt.tight_layout()
 
-    # 保存图像
+    # Save image
     filepath = os.path.join(OUTPUT_DIR, OUTPUT_FIT_PLOT)
     plt.savefig(filepath, dpi=PLOT_DPI, format=PLOT_FORMAT)
     plt.close()
 
     print("="*60)
-    print("线性拟合图保存成功!")
+    print("Linear fit plot saved successfully!")
     print("="*60)
-    print(f"文件路径: {filepath}")
-    print(f"拟合方程: Δλ = {slope:.4f}×d + {intercept:.4f}")
-    print(f"R²值: {r_squared:.4f}")
+    print(f"File path: {filepath}")
+    print(f"Fitting equation: Δλ = {slope:.4f}×d + {intercept:.4f}")
+    print(f"R² value: {r_squared:.4f}")
 
     return filepath
 
 
 def plot_all_spectra_comparison(wavelength, power_data, displacement):
     """
-    绘制所有位移点的光谱对比图（可选功能）
+    Plot comparison of all displacement spectra (optional feature)
 
     Args:
-        wavelength: 波长数组
-        power_data: 功率数据矩阵
-        displacement: 位移数组
+        wavelength: Wavelength array
+        power_data: Power data matrix
+        displacement: Displacement array
 
     Returns:
-        str: 图像文件路径
+        str: Image file path
     """
     ensure_output_dir()
 
     plt.figure(figsize=(12, 8))
 
-    # 使用渐变色绘制所有光谱
+    # Use gradient colors for all spectra
     colors = plt.cm.viridis(np.linspace(0, 1, len(displacement)))
 
     for i, color in enumerate(colors):
@@ -270,38 +270,38 @@ def plot_all_spectra_comparison(wavelength, power_data, displacement):
     plt.savefig(filepath, dpi=PLOT_DPI, format='png')
     plt.close()
 
-    print(f"\n全光谱对比图已保存: {filepath}")
+    print(f"\nAll spectra comparison plot saved: {filepath}")
 
     return filepath
 
 
 if __name__ == "__main__":
-    # 测试绘图功能
+    # Test plotting functionality
     from data_loader import load_all_data
     from dip_analysis import find_dip_wavelength
     from wavelength_shift import calculate_wavelength_shift
     from config import get_displacement_array
 
-    # 加载和处理数据
+    # Load and process data
     wavelength, power_data = load_all_data()
     dip_wavelength = find_dip_wavelength(wavelength, power_data)
     wavelength_shift = calculate_wavelength_shift(dip_wavelength)
     displacement = get_displacement_array()
 
-    # 绘制光谱图
+    # Plot spectra
     spectra_path = plot_spectra(wavelength, power_data, displacement)
 
-    # 绘制波长偏移图
+    # Plot wavelength shift
     shift_path = plot_wavelength_shift(displacement, wavelength_shift)
 
-    # 简单线性拟合用于测试
+    # Simple linear fit for testing
     slope, intercept = np.polyfit(displacement, wavelength_shift, 1)
     y_pred = slope * displacement + intercept
     ss_tot = np.sum((wavelength_shift - np.mean(wavelength_shift)) ** 2)
     ss_res = np.sum((wavelength_shift - y_pred) ** 2)
     r_squared = 1 - (ss_res / ss_tot)
 
-    # 绘制线性拟合图
+    # Plot linear fit
     fit_path = plot_linear_fit(displacement, wavelength_shift, slope, intercept, r_squared)
 
-    print("\n所有图像已生成完成!")
+    print("\nAll images generated successfully!")

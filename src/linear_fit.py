@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-线性拟合模块
-负责对波长偏移-位移数据进行线性拟合，并计算传感器灵敏度
+Linear Fitting Module
+Responsible for performing linear fitting on wavelength shift-displacement data and calculating sensor sensitivity
 """
 
 import numpy as np
@@ -11,64 +11,64 @@ from config import get_displacement_array
 
 def perform_linear_fit(displacement, wavelength_shift):
     """
-    对波长偏移-位移数据进行线性拟合
+    Perform linear fitting on wavelength shift-displacement data
 
     Args:
-        displacement: 位移数组，单位mm
-        wavelength_shift: 波长偏移数组，单位nm
+        displacement: Displacement array in mm
+        wavelength_shift: Wavelength shift array in nm
 
     Returns:
-        dict: 包含拟合结果的字典
-            - slope: 斜率（灵敏度）
-            - intercept: 截距
-            - r_squared: R²值
-            - y_pred: 拟合预测值
-            - residuals: 残差
+        dict: Dictionary containing fitting results
+            - slope: Slope (sensitivity)
+            - intercept: Intercept
+            - r_squared: R² value
+            - y_pred: Fitted values
+            - residuals: Residuals
 
-    拟合方法:
-        使用最小二乘法进行一阶多项式拟合
-        Python实现: np.polyfit(displacement, wavelength_shift, 1)
+    Fitting method:
+        First-order polynomial fitting using least squares
+        Python implementation: np.polyfit(displacement, wavelength_shift, 1)
 
-    拟合参数:
-        斜率 (m): polyfit结果[0]
-        截距 (b): polyfit结果[1]
-        拟合方程: Δλ = m × d + b
+    Fitting parameters:
+        Slope (m): polyfit result[0]
+        Intercept (b): polyfit result[1]
+        Fitting equation: Δλ = m × d + b
     """
     print("="*60)
-    print("开始线性拟合...")
+    print("Performing Linear Fitting...")
     print("="*60)
 
-    # 一阶多项式拟合
+    # First-order polynomial fitting
     coefficients = np.polyfit(displacement, wavelength_shift, 1)
     slope = coefficients[0]
     intercept = coefficients[1]
 
-    # 计算拟合预测值
+    # Calculate fitted values
     y_pred = slope * displacement + intercept
 
-    # 计算R²值
+    # Calculate R² value
     ss_tot = np.sum((wavelength_shift - np.mean(wavelength_shift)) ** 2)
     ss_res = np.sum((wavelength_shift - y_pred) ** 2)
     r_squared = 1 - (ss_res / ss_tot)
 
-    # 计算残差
+    # Calculate residuals
     residuals = wavelength_shift - y_pred
 
-    # 打印拟合结果
-    print(f"拟合方程: Δλ = {slope:.4f} × d + {intercept:.4f}")
-    print(f"斜率 (灵敏度): {slope:.4f} nm/mm")
-    print(f"截距: {intercept:.4f} nm")
-    print(f"R²值: {r_squared:.4f}")
+    # Print fitting results
+    print(f"Fitting equation: Δλ = {slope:.4f} × d + {intercept:.4f}")
+    print(f"Slope (Sensitivity): {slope:.4f} nm/mm")
+    print(f"Intercept: {intercept:.4f} nm")
+    print(f"R² value: {r_squared:.4f}")
 
-    # 评估拟合质量
+    # Evaluate fitting quality
     if r_squared > 0.95:
-        print("拟合质量: 优秀 (R² > 0.95)")
+        print("Fitting quality: Excellent (R² > 0.95)")
     elif r_squared > 0.90:
-        print("拟合质量: 良好 (R² > 0.90)")
+        print("Fitting quality: Good (R² > 0.90)")
     elif r_squared > 0.80:
-        print("拟合质量: 一般 (R² > 0.80)")
+        print("Fitting quality: Fair (R² > 0.80)")
     else:
-        print("拟合质量: 较差 (R² < 0.80)，可能存在非线性关系")
+        print("Fitting quality: Poor (R² < 0.80), possible non-linear relationship")
 
     print("="*60)
 
@@ -86,26 +86,26 @@ def perform_linear_fit(displacement, wavelength_shift):
 
 def calculate_sensitivity(slope):
     """
-    计算传感器灵敏度
+    Calculate sensor sensitivity
 
     Args:
-        slope: 线性拟合的斜率
+        slope: Slope of linear fit
 
     Returns:
-        float: 传感器灵敏度，单位nm/mm
+        float: Sensor sensitivity in nm/mm
 
-    物理意义:
-        灵敏度表示每毫米位移引起的波长变化量。
-        灵敏度越高，传感器对微小位移越敏感。
-        是评估传感器性能的关键指标。
+    Physical meaning:
+        Sensitivity represents the amount of wavelength change per millimeter displacement.
+        Higher sensitivity means the sensor is more sensitive to small displacements.
+        This is a key indicator for evaluating sensor performance.
     """
     sensitivity = slope
 
     print("="*60)
-    print("传感器灵敏度计算结果:")
+    print("Sensor Sensitivity Calculation Results:")
     print("="*60)
-    print(f"灵敏度: {sensitivity:.4f} nm/mm")
-    print(f"物理意义: 每毫米位移引起 {sensitivity:.4f} nm 的波长变化")
+    print(f"Sensitivity: {sensitivity:.4f} nm/mm")
+    print(f"Physical meaning: {sensitivity:.4f} nm wavelength change per mm displacement")
     print("="*60)
 
     return sensitivity
@@ -113,44 +113,44 @@ def calculate_sensitivity(slope):
 
 def analyze_residuals(residuals, displacement):
     """
-    分析拟合残差，检查是否存在非线性或异常点
+    Analyze fitting residuals to check for non-linearity or outliers
 
     Args:
-        residuals: 拟合残差数组
-        displacement: 位移数组
+        residuals: Fitting residuals array
+        displacement: Displacement array
 
     Returns:
-        dict: 残差分析结果
+        dict: Residual analysis results
     """
-    # 计算残差统计量
+    # Calculate residual statistics
     mean_residual = np.mean(residuals)
     std_residual = np.std(residuals)
     max_residual = np.abs(residuals).max()
 
-    # 找到残差最大的点（可能的异常点）
+    # Find point with maximum residual (potential outlier)
     max_residual_idx = np.argmax(np.abs(residuals))
     max_residual_disp = displacement[max_residual_idx]
 
-    print("\n残差分析:")
-    print(f"  平均残差: {mean_residual:.4f} nm")
-    print(f"  残差标准差: {std_residual:.4f} nm")
-    print(f"  最大残差: {max_residual:.4f} nm (位移 {max_residual_disp} mm)")
+    print("\nResidual Analysis:")
+    print(f"  Mean residual: {mean_residual:.4f} nm")
+    print(f"  Residual standard deviation: {std_residual:.4f} nm")
+    print(f"  Maximum residual: {max_residual:.4f} nm (displacement {max_residual_disp} mm)")
 
-    # 检查残差是否随机分布
+    # Check if residuals are randomly distributed
     if np.abs(mean_residual) < 0.001:
-        print("  残差分布: 随机分布（平均残差接近0）")
+        print("  Residual distribution: Random (mean residual close to 0)")
     else:
-        print("  残差分布: 可能存在系统性偏差")
+        print("  Residual distribution: Possible systematic bias")
 
-    # 检查是否存在非线性趋势
-    # 通过检查残差与位移的关系来判断
+    # Check for non-linear trend
+    # Check trend by examining relationship between residuals and displacement
     if len(residuals) > 5:
-        # 简单检查：残差是否有明显的趋势
+        # Simple check: do residuals show a clear trend?
         residual_trend = np.polyfit(displacement, residuals, 1)[0]
         if np.abs(residual_trend) > 0.01:
-            print("  警告: 残差存在趋势，可能存在非线性关系")
+            print("  Warning: Residuals show trend, possible non-linear relationship")
         else:
-            print("  残差趋势: 无明显趋势，线性拟合合理")
+            print("  Residual trend: No obvious trend, linear fitting is reasonable")
 
     analysis = {
         'mean_residual': mean_residual,
@@ -165,56 +165,56 @@ def analyze_residuals(residuals, displacement):
 
 def evaluate_sensor_performance(sensitivity, r_squared):
     """
-    评估传感器性能
+    Evaluate sensor performance
 
     Args:
-        sensitivity: 传感器灵敏度（nm/mm）
-        r_squared: 线性拟合R²值
+        sensitivity: Sensor sensitivity (nm/mm)
+        r_squared: R² value of linear fit
 
     Returns:
-        dict: 性能评估结果
+        dict: Performance evaluation results
     """
-    print("\n传感器性能评估:")
+    print("\nSensor Performance Evaluation:")
     print("="*60)
 
-    # 灵敏度评估
+    # Sensitivity evaluation
     if sensitivity > 0.5:
-        sensitivity_level = "高灵敏度"
-        sensitivity_score = "优秀"
+        sensitivity_level = "High sensitivity"
+        sensitivity_score = "Excellent"
     elif sensitivity > 0.1:
-        sensitivity_level = "中等灵敏度"
-        sensitivity_score = "良好"
+        sensitivity_level = "Medium sensitivity"
+        sensitivity_score = "Good"
     else:
-        sensitivity_level = "低灵敏度"
-        sensitivity_score = "一般"
+        sensitivity_level = "Low sensitivity"
+        sensitivity_score = "Fair"
 
-    print(f"灵敏度评估: {sensitivity_level} ({sensitivity_score})")
+    print(f"Sensitivity evaluation: {sensitivity_level} ({sensitivity_score})")
 
-    # 线性度评估
+    # Linearity evaluation
     if r_squared > 0.98:
-        linearity_level = "极佳线性度"
-        linearity_score = "优秀"
+        linearity_level = "Excellent linearity"
+        linearity_score = "Excellent"
     elif r_squared > 0.95:
-        linearity_level = "良好线性度"
-        linearity_score = "良好"
+        linearity_level = "Good linearity"
+        linearity_score = "Good"
     elif r_squared > 0.90:
-        linearity_level = "一般线性度"
-        linearity_score = "一般"
+        linearity_level = "Fair linearity"
+        linearity_score = "Fair"
     else:
-        linearity_level = "较差线性度"
-        linearity_score = "较差"
+        linearity_level = "Poor linearity"
+        linearity_score = "Poor"
 
-    print(f"线性度评估: {linearity_level} ({linearity_score})")
+    print(f"Linearity evaluation: {linearity_level} ({linearity_score})")
 
-    # 综合评估
-    if sensitivity_score == "优秀" and linearity_score == "优秀":
-        overall_score = "优秀"
-    elif sensitivity_score in ["优秀", "良好"] and linearity_score in ["优秀", "良好"]:
-        overall_score = "良好"
+    # Overall evaluation
+    if sensitivity_score == "Excellent" and linearity_score == "Excellent":
+        overall_score = "Excellent"
+    elif sensitivity_score in ["Excellent", "Good"] and linearity_score in ["Excellent", "Good"]:
+        overall_score = "Good"
     else:
-        overall_score = "一般"
+        overall_score = "Fair"
 
-    print(f"综合评估: {overall_score}")
+    print(f"Overall evaluation: {overall_score}")
     print("="*60)
 
     performance = {
@@ -229,25 +229,25 @@ def evaluate_sensor_performance(sensitivity, r_squared):
 
 
 if __name__ == "__main__":
-    # 测试线性拟合功能
+    # Test linear fitting functionality
     from data_loader import load_all_data
     from dip_analysis import find_dip_wavelength
     from wavelength_shift import calculate_wavelength_shift
 
-    # 加载和处理数据
+    # Load and process data
     wavelength, power_data = load_all_data()
     dip_wavelength = find_dip_wavelength(wavelength, power_data)
     wavelength_shift = calculate_wavelength_shift(dip_wavelength)
     displacement = get_displacement_array()
 
-    # 执行线性拟合
+    # Perform linear fitting
     fit_results = perform_linear_fit(displacement, wavelength_shift)
 
-    # 计算灵敏度
+    # Calculate sensitivity
     sensitivity = calculate_sensitivity(fit_results['slope'])
 
-    # 分析残差
+    # Analyze residuals
     residual_analysis = analyze_residuals(fit_results['residuals'], displacement)
 
-    # 评估传感器性能
+    # Evaluate sensor performance
     performance = evaluate_sensor_performance(sensitivity, fit_results['r_squared'])

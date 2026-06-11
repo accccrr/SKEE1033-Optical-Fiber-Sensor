@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Dip Wavelength分析模块
-负责计算每个位移位置的凹陷波长（功率最小值对应的波长）
+Dip Wavelength Analysis Module
+Responsible for calculating dip wavelength (wavelength corresponding to minimum power) for each displacement position
 """
 
 import numpy as np
@@ -11,41 +11,41 @@ from config import NUM_MEASUREMENTS, get_displacement_array
 
 def find_dip_wavelength(wavelength, power_data):
     """
-    找到每个位移位置下功率最低时对应的波长
+    Find the wavelength corresponding to minimum power for each displacement position
 
     Args:
-        wavelength: 波长数组，单位nm
-        power_data: 功率数据矩阵，shape=(波长点数, 位移点数)
+        wavelength: Wavelength array in nm
+        power_data: Power data matrix with shape=(number of wavelength points, number of displacement points)
 
     Returns:
-        numpy.ndarray: Dip wavelength数组，长度为位移点数，单位nm
+        numpy.ndarray: Dip wavelength array with length equal to number of displacement points, unit: nm
 
-    物理意义:
-        Dip wavelength是光谱曲线中功率最小值对应的波长，
-        这是传感器响应位移变化的特征波长。
-        当传感器发生位移时，dip wavelength会随之偏移。
+    Physical meaning:
+        Dip wavelength is the wavelength corresponding to the minimum power in the spectral curve.
+        This is the characteristic wavelength where the sensor responds to displacement changes.
+        When the sensor is displaced, the dip wavelength shifts accordingly.
     """
     dip_wavelength = np.zeros(NUM_MEASUREMENTS)
 
     print("="*60)
-    print("开始计算Dip Wavelength...")
+    print("Calculating Dip Wavelength...")
     print("="*60)
 
     for i in range(NUM_MEASUREMENTS):
-        # 找到功率最小的索引
+        # Find index of minimum power
         min_index = np.argmin(power_data[:, i])
 
-        # 获取对应的波长
+        # Get corresponding wavelength
         dip_wavelength[i] = wavelength[min_index]
 
-        # 获取最小功率值
+        # Get minimum power value
         min_power = power_data[min_index, i]
 
-        print(f"位移点 {i+1}: Dip波长 = {dip_wavelength[i]:.4f} nm, "
-              f"最小功率 = {min_power:.4f} dBm")
+        print(f"Displacement point {i+1}: Dip wavelength = {dip_wavelength[i]:.4f} nm, "
+              f"Minimum power = {min_power:.4f} dBm")
 
     print("="*60)
-    print("Dip Wavelength计算完成!")
+    print("Dip Wavelength calculation complete!")
     print("="*60)
 
     return dip_wavelength
@@ -53,24 +53,24 @@ def find_dip_wavelength(wavelength, power_data):
 
 def analyze_dip_characteristics(wavelength, power_data, dip_wavelength):
     """
-    分析Dip特征，包括功率最小值和波长范围
+    Analyze dip characteristics including minimum power and wavelength range
 
     Args:
-        wavelength: 波长数组
-        power_data: 功率数据矩阵
-        dip_wavelength: Dip wavelength数组
+        wavelength: Wavelength array
+        power_data: Power data matrix
+        dip_wavelength: Dip wavelength array
 
     Returns:
-        dict: 包含Dip特征信息的字典
+        dict: Dictionary containing dip characteristic information
     """
     displacement = get_displacement_array()
 
-    # 获取每个位移点的最小功率值
+    # Get minimum power value for each displacement point
     min_powers = np.zeros(NUM_MEASUREMENTS)
     for i in range(NUM_MEASUREMENTS):
         min_powers[i] = np.min(power_data[:, i])
 
-    # 计算Dip波长范围
+    # Calculate dip wavelength range
     dip_range = dip_wavelength.max() - dip_wavelength.min()
 
     characteristics = {
@@ -82,56 +82,56 @@ def analyze_dip_characteristics(wavelength, power_data, dip_wavelength):
         'dip_wavelength_max': dip_wavelength.max(),
     }
 
-    print("\nDip特征分析:")
-    print(f"  Dip波长范围: {dip_range:.4f} nm")
-    print(f"  最小Dip波长: {dip_wavelength.min():.4f} nm (位移={displacement[dip_wavelength.argmin()]} mm)")
-    print(f"  最大Dip波长: {dip_wavelength.max():.4f} nm (位移={displacement[dip_wavelength.argmax()]} mm)")
-    print(f"  平均最小功率: {min_powers.mean():.4f} dBm")
+    print("\nDip characteristics analysis:")
+    print(f"  Dip wavelength range: {dip_range:.4f} nm")
+    print(f"  Minimum dip wavelength: {dip_wavelength.min():.4f} nm (displacement={displacement[dip_wavelength.argmin()]} mm)")
+    print(f"  Maximum dip wavelength: {dip_wavelength.max():.4f} nm (displacement={displacement[dip_wavelength.argmax()]} mm)")
+    print(f"  Average minimum power: {min_powers.mean():.4f} dBm")
 
     return characteristics
 
 
 def check_multiple_minima(wavelength, power_data, tolerance=0.001):
     """
-    检查是否存在多个功率最小值点
+    Check for multiple minimum power points
 
     Args:
-        wavelength: 波长数组
-        power_data: 功率数据矩阵
-        tolerance: 判断多个最小值的容差（dBm）
+        wavelength: Wavelength array
+        power_data: Power data matrix
+        tolerance: Tolerance for determining multiple minima (dBm)
 
     Returns:
-        list: 包含多个最小值的位移点索引列表
+        list: List of displacement point indices with multiple minima
     """
     multiple_minima_indices = []
 
     for i in range(NUM_MEASUREMENTS):
         min_power = np.min(power_data[:, i])
-        # 找到所有接近最小值的点
+        # Find all points close to minimum
         min_indices = np.where(
             np.abs(power_data[:, i] - min_power) < tolerance
         )[0]
 
         if len(min_indices) > 1:
             multiple_minima_indices.append(i)
-            print(f"警告: 位移点 {i+1} 存在 {len(min_indices)} 个接近最小值的点")
+            print(f"Warning: Displacement point {i+1} has {len(min_indices)} points close to minimum")
 
     return multiple_minima_indices
 
 
 if __name__ == "__main__":
-    # 测试Dip wavelength计算
+    # Test dip wavelength calculation
     from data_loader import load_all_data
 
     wavelength, power_data = load_all_data()
     dip_wavelength = find_dip_wavelength(wavelength, power_data)
 
-    print(f"\nDip wavelength数组: {dip_wavelength}")
+    print(f"\nDip wavelength array: {dip_wavelength}")
 
-    # 分析Dip特征
+    # Analyze dip characteristics
     characteristics = analyze_dip_characteristics(wavelength, power_data, dip_wavelength)
 
-    # 检查多个最小值
+    # Check for multiple minima
     multiple_minima = check_multiple_minima(wavelength, power_data)
     if multiple_minima:
-        print(f"\n存在多个最小值的位移点: {multiple_minima}")
+        print(f"\nDisplacement points with multiple minima: {multiple_minima}")

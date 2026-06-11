@@ -1,49 +1,49 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-配置文件模块
-定义项目所需的路径、参数和常量
+Configuration Module
+Defines paths, parameters, and constants for the project
 """
 
 import os
 
-# 项目根目录（src目录的父目录）
+# Project root directory (parent of src directory)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 数据目录
+# Data directory
 DATA_DIR = os.path.join(PROJECT_ROOT, 'Data')
 
-# 输出目录
+# Output directory
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
 
-# 数据文件配置
+# Data file configuration
 WAVELENGTH_FILE = 'WL.txt'
 POWER_FILE_PATTERN = 'P{}.txt'  # P1.txt, P2.txt, ..., P15.txt
-NUM_MEASUREMENTS = 15  # 测量点数量
+NUM_MEASUREMENTS = 15  # Number of measurement points
 
-# 位移配置
-DISPLACEMENT_STEP = 2  # 位移步长 (mm)
-DISPLACEMENT_START = 0  # 起始位移 (mm)
-DISPLACEMENT_END = 28  # 结束位移 (mm)
+# Displacement configuration
+DISPLACEMENT_STEP = 2  # Displacement step (mm)
+DISPLACEMENT_START = 0  # Start displacement (mm)
+DISPLACEMENT_END = 28  # End displacement (mm)
 
-# 绘图配置
-PLOT_DPI = 300  # 图像分辨率
-PLOT_FORMAT = 'png'  # 图像格式
-PLOT_SIZE = (10, 6)  # 图像尺寸 (宽, 高)
+# Plot configuration
+PLOT_DPI = 300  # Image resolution
+PLOT_FORMAT = 'png'  # Image format
+PLOT_SIZE = (10, 6)  # Image size (width, height)
 
-# 需要绘制的位移点（用于光谱图）
+# Displacement points to plot (for spectra plot)
 PLOT_DISPLACEMENTS = [0, 4, 8, 12, 16, 20, 24, 28]  # mm
 
-# 输出文件名
+# Output filenames
 OUTPUT_CSV = 'sensor_data_analysis.csv'
 OUTPUT_SPECTRA_PLOT = 'spectra_plot.png'
 OUTPUT_SHIFT_PLOT = 'wavelength_shift_plot.png'
 OUTPUT_FIT_PLOT = 'linear_fit_plot.png'
 
-# 数据精度
-DECIMAL_PLACES = 4  # 小数位数
+# Data precision
+DECIMAL_PLACES = 4  # Number of decimal places
 
-# 颜色配置（用于光谱图）
+# Color configuration (for spectra plot)
 SPECTRA_COLORS = [
     'blue', 'green', 'red', 'cyan',
     'magenta', 'orange', 'purple', 'brown'
@@ -51,18 +51,18 @@ SPECTRA_COLORS = [
 
 
 def ensure_output_dir():
-    """确保输出目录存在"""
+    """Ensure output directory exists"""
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
-        print(f"创建输出目录: {OUTPUT_DIR}")
+        print(f"Created output directory: {OUTPUT_DIR}")
 
 
 def get_displacement_array():
     """
-    生成位移数组
+    Generate displacement array
 
     Returns:
-        numpy.ndarray: 位移数组，单位mm
+        numpy.ndarray: Displacement array in mm
     """
     import numpy as np
     displacements = np.arange(
@@ -75,10 +75,10 @@ def get_displacement_array():
 
 def get_plot_indices():
     """
-    获取需要绘制的位移点在位移数组中的索引
+    Get indices of displacement points to plot in the displacement array
 
     Returns:
-        list: 索引列表
+        list: Index list
     """
     indices = [d // DISPLACEMENT_STEP for d in PLOT_DISPLACEMENTS]
     return indices
