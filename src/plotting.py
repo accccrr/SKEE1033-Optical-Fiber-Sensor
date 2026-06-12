@@ -36,14 +36,15 @@ def plot_spectra(wavelength, power_data, displacement):
         - Selected displacement points: 0, 4, 8, 12, 16, 20, 24, 28 mm
         - 8 curves total, distinguished by different colors
         - Include legend, axis labels, and title
+        - Zoom in on the dip region for better visualization
     """
     ensure_output_dir()
 
     # Get indices of displacement points to plot
     plot_indices = get_plot_indices()
 
-    # Create figure
-    plt.figure(figsize=PLOT_SIZE)
+    # Create figure with wider aspect ratio for better spread
+    plt.figure(figsize=(14, 7))
 
     # Plot each spectra curve
     for idx, color in zip(plot_indices, SPECTRA_COLORS):
@@ -57,15 +58,19 @@ def plot_spectra(wavelength, power_data, displacement):
         )
 
     # Set axis labels and title
-    plt.xlabel('Wavelength (nm)', fontsize=12)
-    plt.ylabel('Power (dBm)', fontsize=12)
-    plt.title('Optical Fiber Displacement Sensor Spectra', fontsize=14)
+    plt.xlabel('Wavelength (nm)', fontsize=14)
+    plt.ylabel('Power (dBm)', fontsize=14)
+    plt.title('Optical Fiber Displacement Sensor Spectra', fontsize=16)
 
-    # Set legend
-    plt.legend(loc='best', fontsize=10)
+    # Set legend with better positioning
+    plt.legend(loc='lower left', fontsize=12)
 
     # Add grid
     plt.grid(True, alpha=0.3)
+
+    # Zoom in on the dip region (1552-1555 nm) for better visualization
+    plt.xlim(1552.0, 1555.0)
+    plt.ylim(-47, -31)
 
     # Adjust layout
     plt.tight_layout()
@@ -244,7 +249,8 @@ def plot_all_spectra_comparison(wavelength, power_data, displacement):
     """
     ensure_output_dir()
 
-    plt.figure(figsize=(12, 8))
+    # Create figure with wider aspect ratio for better spread
+    plt.figure(figsize=(14, 7))
 
     # Use gradient colors for all spectra
     colors = plt.cm.viridis(np.linspace(0, 1, len(displacement)))
@@ -254,16 +260,27 @@ def plot_all_spectra_comparison(wavelength, power_data, displacement):
             wavelength,
             power_data[:, i],
             color=color,
-            linewidth=1,
-            alpha=0.7,
+            linewidth=1.5,
+            alpha=0.8,
             label=f'{displacement[i]} mm'
         )
 
-    plt.xlabel('Wavelength (nm)', fontsize=12)
-    plt.ylabel('Power (dBm)', fontsize=12)
-    plt.title('All Spectra Comparison', fontsize=14)
-    plt.legend(loc='best', fontsize=8, ncol=2)
+    # Set axis labels and title
+    plt.xlabel('Wavelength (nm)', fontsize=14)
+    plt.ylabel('Power (dBm)', fontsize=14)
+    plt.title('All Spectra Comparison', fontsize=16)
+
+    # Set legend with better positioning
+    plt.legend(loc='lower left', fontsize=12, ncol=2)
+
+    # Add grid
     plt.grid(True, alpha=0.3)
+
+    # Zoom in on the dip region (1552-1555 nm) for better visualization
+    plt.xlim(1552.0, 1555.0)
+    plt.ylim(-47, -31)
+
+    # Adjust layout
     plt.tight_layout()
 
     filepath = os.path.join(OUTPUT_DIR, 'all_spectra_comparison.png')
